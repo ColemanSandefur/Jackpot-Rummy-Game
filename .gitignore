@@ -1,0 +1,10 @@
+Builds/
+Logs/
+Packages/
+.vscode/
+Library/
+ProjectSettings/
+obj/
+
+Assembly-CSharp.csproj
+Assembly-CSharp-Editor.csproj
