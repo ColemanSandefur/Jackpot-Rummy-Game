@@ -192,6 +192,7 @@ public class SocketDataManager : MonoBehaviour
 
     public static void RemoveCard(byte[] data) {
         byte cardByte = data[2];
+        PlayingCardManager.removeCardHandBytes.Add(cardByte);
     }
 
     public void PlayCard(PlayingCard card) {

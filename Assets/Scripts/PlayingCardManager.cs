@@ -12,6 +12,7 @@ public class PlayingCardManager : MonoBehaviour
     public GameObject prefabToStatic;
     public static List<PlayingCard> playingCards = new List<PlayingCard>();
     public static List<byte> newCardHandBytes = new List<byte>();
+    public static List<byte> removeCardHandBytes = new List<byte>();
     public static GameObject objectHideFolder;
     public GameObject objectHideFolderToStatic;
 
@@ -77,7 +78,20 @@ public class PlayingCardManager : MonoBehaviour
             newCardHandBytes.Remove(cardByte);
         }
 
-        if (tmpNewCardHandBytes.Length > 0) {
+        int removeLength = removeCardHandBytes.Count;
+        if (removeCardHandBytes.Count > 0) {
+            for (int i = 0; i < playingCards.Count; i++) {
+                PlayingCard card = playingCards[i];
+                if (removeCardHandBytes.Contains(card.cardByte)) {
+                    removeCardHandBytes.Remove(playingCards[i].cardByte);
+                    playingCards.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+        
+
+        if (tmpNewCardHandBytes.Length > 0 || removeLength > 0) {
             SortCards((int)PlayingCardSorter.Sorts.byteOrder);
         }
     }

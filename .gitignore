@@ -1,10 +1,13 @@
-Builds/
-Logs/
-Packages/
+#Directories
 .vscode/
+Builds/
 Library/
-ProjectSettings/
+Logs/
 obj/
+Packages/
+ProjectSettings/
+Temp/
 
+#Files
 Assembly-CSharp.csproj
 Assembly-CSharp-Editor.csproj
