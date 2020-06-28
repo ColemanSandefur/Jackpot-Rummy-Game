@@ -23,7 +23,10 @@ public class SocketDataManager : MonoBehaviour
         PokerBidTurn = 13,
         PokerResults = 14,
         AlertCard = 15,
-        RemoveCard = 16
+        RemoveCard = 16,
+        JackpotResults = 17,
+        WonBoardSlot = 18,
+        GiveBoard = 19
     }
 
     // Start is called before the first frame update
@@ -77,6 +80,7 @@ public class SocketDataManager : MonoBehaviour
                 case Commands.PokerResults: PokerResults(data); break;
                 case Commands.AlertCard: AlertCard(data); break;
                 case Commands.RemoveCard: RemoveCard(data); break;
+                case Commands.GiveBoard: GiveBoard(data); break;
             }
         }
     }
@@ -199,5 +203,26 @@ public class SocketDataManager : MonoBehaviour
         byte[] data = new byte[] {(byte) Commands.PlayCard, 1, card.cardByte};
         SocketManager.SendData(data);
         Debug.Log("Playing card");
+    }
+
+    public static void GiveBoard(byte[] data) {
+        int length = data[1];
+        int blockLength = data[2];
+        data = data.Skip(3).ToArray();
+
+        while (data.Count() > 0) {
+            Debug.Log($"byte: {data[0]}; boardSlot: {(GameBoardSlot.BoardSlots) data[0]}");
+            GameBoardSlot.BoardSlots slot = (GameBoardSlot.BoardSlots) data[0];
+            byte[] byteOfInt = data.Skip(1).Take(4).ToArray();
+
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(byteOfInt);
+            int number = BitConverter.ToInt32(byteOfInt, 0);
+
+            Debug.Log(slot);
+            GameBoard.GetSlot(slot).setChips(number);
+
+            data = data.Skip(blockLength).ToArray();
+        }
     }
 }

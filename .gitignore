@@ -7,7 +7,9 @@ obj/
 Packages/
 ProjectSettings/
 Temp/
+TextMesh Pro/
 
 #Files
 Assembly-CSharp.csproj
 Assembly-CSharp-Editor.csproj
+TextMesh Pro.meta
