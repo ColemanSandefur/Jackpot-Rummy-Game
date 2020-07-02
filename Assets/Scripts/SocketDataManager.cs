@@ -31,7 +31,7 @@ public class SocketDataManager : MonoBehaviour
 
     public TextComponent _WarningMessageText;
     public static TextComponent WarningMessageText;
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -74,6 +74,8 @@ public class SocketDataManager : MonoBehaviour
                 case Commands.PokerResults: PokerResults(data); break;
                 case Commands.AlertCard: AlertCard(data); break;
                 case Commands.RemoveCard: RemoveCard(data); break;
+                case Commands.JackpotResults: JackpotResults(data); break;
+                case Commands.WonBoardSlot: WonBoardSlot(data); break;
                 case Commands.GiveBoard: GiveBoard(data); break;
             }
         }
@@ -173,6 +175,8 @@ public class SocketDataManager : MonoBehaviour
     }
 
     public static void PokerResults(byte[] data) {
+        Debug.Log("set it to false");
+        CardDisplayManager.playingPoker = false;
         if (data[1] == 1) {
             WarningMessageText.Message = "You Lost";
             return;
@@ -203,6 +207,30 @@ public class SocketDataManager : MonoBehaviour
     public void PlayCard(PlayingCard card) {
         byte[] data = new byte[] {(byte) Commands.PlayCard, 1, card.cardByte};
         SocketManager.SendData(data);
+    }
+
+    public static void JackpotResults(byte[] data) {
+        int length = data[1];
+        bool won = data[2] == 1;
+
+        if (won) {
+            WarningMessageText.Message = "You won!";
+        } else {
+            WarningMessageText.Message = "You lost!";
+        }
+    }
+
+    public static void WonBoardSlot(byte[] data) {
+        int length = data[1];
+        int slot_num = data[2];
+        
+        byte[] byteOfInt = data.Skip(3).Take(4).ToArray();
+
+        if (BitConverter.IsLittleEndian) 
+            Array.Reverse(byteOfInt);
+
+        int chipCount = BitConverter.ToInt32(byteOfInt, 0);
+        WarningMessageText.Message = ($"You won {chipCount} chips");
     }
 
     public static void GiveBoard(byte[] data) {

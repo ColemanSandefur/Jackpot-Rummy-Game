@@ -9,11 +9,13 @@ public class CardDisplayManager : MonoBehaviour
     static List<GameObject> CardsToBeDisplayed = new List<GameObject>();
     static List<GameObject> PokerHand = new List<GameObject>();
     static byte[] singleCard =  new byte[] {0, 0}; // {should be updated, new card byte}
+    public static bool playingPoker = true;
     public GameObject cardDisplayer;
     public GameObject singleCardDisplay;
     public GameObject bestPokerHandBar;
     public PokerHand pokerHand;
     public GameObject hiddenObjects;
+    
 
     void Update()
     {
@@ -47,17 +49,22 @@ public class CardDisplayManager : MonoBehaviour
                 foreach (PlayingCard card in pokerHand.cards) {
                     Destroy(card.gameObject);
                 }
+
+                pokerHand = null;
             }
 
-            //Find and display best PokerHand
-            pokerHand = PokerHandManager.FindBestPokerHand(tmpCards);
-            GameObject bestPokerHandDisplay = bestPokerHandBar.transform.Find("BestPokerHandDisplay").gameObject;
-            foreach (PlayingCard card in pokerHand.cards) {
-                card.gameObject.transform.SetParent(bestPokerHandDisplay.transform);
-                card.gameObject.transform.localScale = new Vector3(1f, 1f, 1f);
-                card.gameObject.transform.position = new Vector3(0, 0, 0);
+            if (playingPoker && tmpCards.Count >= 5) {
+                //Find and display best PokerHand
+                pokerHand = PokerHandManager.FindBestPokerHand(tmpCards);
+                GameObject bestPokerHandDisplay = bestPokerHandBar.transform.Find("BestPokerHandDisplay").gameObject;
+                foreach (PlayingCard card in pokerHand.cards) {
+                    card.gameObject.transform.SetParent(bestPokerHandDisplay.transform);
+                    card.gameObject.transform.localScale = new Vector3(1f, 1f, 1f);
+                    card.gameObject.transform.position = new Vector3(0, 0, 0);
+                }
+                bestPokerHandBar.transform.Find("BestPokerHandName").GetComponent<Text>().text = pokerHand.pokerHand + "";
             }
-            bestPokerHandBar.transform.Find("BestPokerHandName").GetComponent<Text>().text = pokerHand.pokerHand + "";
+            
             
             // Debug.Log("Best Hand: " + pokerHand.pokerHand);
         }
