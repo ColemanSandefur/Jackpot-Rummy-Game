@@ -385,7 +385,6 @@ public class PokerHandManager : MonoBehaviour
             }
 
             if (hand.Count == 2) {
-                Debug.Log($"pair: {hand[0]} {hand[1]}");
                 return hand.ToArray();
             }
         }

@@ -59,7 +59,7 @@ public class CardDisplayManager : MonoBehaviour
             }
             bestPokerHandBar.transform.Find("BestPokerHandName").GetComponent<Text>().text = pokerHand.pokerHand + "";
             
-            Debug.Log("Best Hand: " + pokerHand.pokerHand);
+            // Debug.Log("Best Hand: " + pokerHand.pokerHand);
         }
 
         //Update Single Card Display

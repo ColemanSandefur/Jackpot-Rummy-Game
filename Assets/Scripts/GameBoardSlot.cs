@@ -21,7 +21,6 @@ public class GameBoardSlot : MonoBehaviour
     {
         if (updateChips) {
             updateChips = false;
-            Debug.Log($"num of children: {transform.childCount}");
             transform.Find("Ammount").Find("Text").gameObject.GetComponent<TextMeshProUGUI>().SetText(chips + "");
         }
     }

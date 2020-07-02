@@ -29,10 +29,13 @@ public class SocketDataManager : MonoBehaviour
         GiveBoard = 19
     }
 
+    public TextComponent _WarningMessageText;
+    public static TextComponent WarningMessageText;
+    
     // Start is called before the first frame update
     void Start()
     {
-        
+        WarningMessageText = _WarningMessageText;
     }
 
     // Update is called once per frame
@@ -40,10 +43,8 @@ public class SocketDataManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space)) {
             SocketManager.SendData(new byte[] {(byte)Commands.Join, 1, 1});
-            Debug.Log("Joining");
         } else if (Input.GetKeyDown(KeyCode.LeftAlt)) {
             SocketManager.SendData(new byte[] {(byte)Commands.ReadyForGame, 1, 1});
-            Debug.Log("Saying Ready");
         }
     }
 
@@ -51,12 +52,6 @@ public class SocketDataManager : MonoBehaviour
         List<byte[]> commandStrings = new List<byte[]>();
 
         byte[] curData = data;
-
-        string x = "";
-        foreach(byte b in data) {
-            x += b + ", ";
-        }
-        Debug.Log(x);
 
         while (curData.Length > 0) {
             commandStrings.Add(curData.Take(curData[1] + 2).ToArray());
@@ -69,7 +64,6 @@ public class SocketDataManager : MonoBehaviour
     public static void ProcessData(List<byte[]> dataList){
         foreach (byte[] data in dataList) {
             Commands command = (Commands)data[0];
-            // Debug.Log($"Incoming data: {command.ToString()}, Length: {data[1]}");
             switch(command) {
                 case Commands.GiveHand: GiveHand(data); break;
                 case Commands.BidTurn: BidTurn(data); break;
@@ -98,6 +92,8 @@ public class SocketDataManager : MonoBehaviour
         int length = data[1];
         data = data.Skip(2).ToArray();
         bool isTurn = data[0] == 0 ? false : true;
+
+        Debug.Log($"Hand Bid Turn: {isTurn}");
 
         GuiManager.SetBidMenuActive(isTurn);
         
@@ -129,7 +125,7 @@ public class SocketDataManager : MonoBehaviour
 
     public static void Message(byte[] data) {
         data = data.Skip(2).ToArray();
-        Debug.Log(Encoding.UTF8.GetString(data, 0, data.Length));
+        WarningMessageText.Message = Encoding.UTF8.GetString(data, 0, data.Length);
     }
 
     public void BidForExtraHand(int chips) {
@@ -151,6 +147,8 @@ public class SocketDataManager : MonoBehaviour
         int length = data[1];
         data = data.Skip(2).ToArray();
         bool isTurn = data[0] == 0 ? false : true;
+
+        Debug.Log($"Poker Turn: {isTurn}");
 
         GuiManager.SetPokerBidMenuActive(isTurn);
         
@@ -176,8 +174,10 @@ public class SocketDataManager : MonoBehaviour
 
     public static void PokerResults(byte[] data) {
         if (data[1] == 1) {
-            Debug.Log("You lost");
+            WarningMessageText.Message = "You Lost";
+            return;
         }
+        
 
         
         byte[] numberBytes = data.Skip(3).Take(4).ToArray();
@@ -186,7 +186,8 @@ public class SocketDataManager : MonoBehaviour
         int number = BitConverter.ToInt32(numberBytes, 0);
         
         
-        Debug.Log($"You won {number} chips");
+        WarningMessageText.Message = ($"You won {number} chips");
+
     }
 
     public static void AlertCard(byte[] data) {
@@ -202,7 +203,6 @@ public class SocketDataManager : MonoBehaviour
     public void PlayCard(PlayingCard card) {
         byte[] data = new byte[] {(byte) Commands.PlayCard, 1, card.cardByte};
         SocketManager.SendData(data);
-        Debug.Log("Playing card");
     }
 
     public static void GiveBoard(byte[] data) {
@@ -211,7 +211,6 @@ public class SocketDataManager : MonoBehaviour
         data = data.Skip(3).ToArray();
 
         while (data.Count() > 0) {
-            Debug.Log($"byte: {data[0]}; boardSlot: {(GameBoardSlot.BoardSlots) data[0]}");
             GameBoardSlot.BoardSlots slot = (GameBoardSlot.BoardSlots) data[0];
             byte[] byteOfInt = data.Skip(1).Take(4).ToArray();
 
@@ -219,7 +218,6 @@ public class SocketDataManager : MonoBehaviour
                 Array.Reverse(byteOfInt);
             int number = BitConverter.ToInt32(byteOfInt, 0);
 
-            Debug.Log(slot);
             GameBoard.GetSlot(slot).setChips(number);
 
             data = data.Skip(blockLength).ToArray();

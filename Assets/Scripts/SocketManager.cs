@@ -30,7 +30,7 @@ public class SocketManager : MonoBehaviour
             clientSocketThread.IsBackground = true;
             clientSocketThread.Start();
         } catch (Exception e) {
-            Debug.Log("On client connect exception " + e);
+            // Debug.Log("On client connect exception " + e);
         }
     }
 
@@ -55,10 +55,10 @@ public class SocketManager : MonoBehaviour
                 socketConnection = null;
                 Debug.Log("closed socket");
             } catch (Exception e) {
-                Debug.Log(e.Message);
+                // Debug.Log(e.Message);
             }
         } catch (SocketException socketException) {
-            Debug.Log("Socket exception: " + socketException);
+            // Debug.Log("Socket exception: " + socketException);
         }
     }
 
@@ -70,7 +70,7 @@ public class SocketManager : MonoBehaviour
         try {
             stream.Write(data, 0, data.Length);
         } catch (SocketException socketException) {
-            Debug.Log("Socket exception: " + socketException);
+            // Debug.Log("Socket exception: " + socketException);
         }
     }
 
@@ -81,7 +81,7 @@ public class SocketManager : MonoBehaviour
             socketConnection.Close();
             Debug.Log("Closed Application");
         } catch (Exception e) {
-            Debug.LogError(e.Message);
+            // Debug.LogError(e.Message);
         }
     }
 }
