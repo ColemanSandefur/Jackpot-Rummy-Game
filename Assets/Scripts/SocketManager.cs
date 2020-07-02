@@ -12,11 +12,19 @@ public class SocketManager : MonoBehaviour
     private TcpClient socketConnection;
     private static NetworkStream stream;
     private bool running = true;
+    public string ip;
+    public int port;
+    public int gameID;
+    public string username;
 
     // Start is called before the first frame update
     void Start()
     {
-        ConnectToServer();
+        byte number = 3;
+        number = (byte) (number << 2);
+        number += 2;
+        Debug.Log(number);
+        // ConnectToServer();
     }
 
     // Update is called once per frame
@@ -24,8 +32,12 @@ public class SocketManager : MonoBehaviour
     {
     }
 
-    private void ConnectToServer() {
+    public void ConnectToServer(string ip, int port, string name, int gameID) {
         try {
+            this.ip = ip;
+            this.port = port;
+            this.name = name;
+            this.gameID = gameID;
             clientSocketThread = new Thread(new ThreadStart(ListenForData));
             clientSocketThread.IsBackground = true;
             clientSocketThread.Start();
@@ -36,8 +48,10 @@ public class SocketManager : MonoBehaviour
 
     private void ListenForData() {
         try {
-            socketConnection = new TcpClient("localhost", 25565);
+            socketConnection = new TcpClient(ip, port);
             stream = socketConnection.GetStream();
+            JoinGame();
+            
             byte[] bytes = new byte[1024];
             while (running == true) {
                 int length;
@@ -83,5 +97,49 @@ public class SocketManager : MonoBehaviour
         } catch (Exception e) {
             // Debug.LogError(e.Message);
         }
+    }
+
+    private void JoinGame() {
+        List<byte> data = new List<byte>();
+        int tmpGameID = gameID;
+
+        // SendData(new byte[] {(byte)SocketDataManager.Commands.Join, 1, (byte)gameID});
+        
+
+        while (tmpGameID > 0) {
+            Debug.Log(tmpGameID);
+            byte b = 0;
+            b += (byte)(tmpGameID % 10);
+            b = (byte)(b << 4);
+            tmpGameID /= 10;
+            b += (byte)(tmpGameID % 10);
+            tmpGameID /= 10;
+
+            data.Add(b);
+        }
+
+        if (data.Count == 0) {
+            data.Add(0);
+        }
+
+        String x = "";
+        foreach (byte b in data) {
+            x += b + ", ";
+        }
+        Debug.Log(x);
+
+        
+        List<byte> dataSend = new List<byte>();
+        dataSend.Add((byte)SocketDataManager.Commands.Join);
+        dataSend.Add((byte)data.Count);
+        dataSend.AddRange(data);
+
+        x = "";
+        foreach (byte b in dataSend) {
+            x += b + ", ";
+        }
+        Debug.Log(x);
+
+        SendData(dataSend.ToArray());
     }
 }

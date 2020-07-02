@@ -26,16 +26,24 @@ public class SocketDataManager : MonoBehaviour
         RemoveCard = 16,
         JackpotResults = 17,
         WonBoardSlot = 18,
-        GiveBoard = 19
+        GiveBoard = 19,
+        JoinState = 20
     }
 
     public TextComponent _WarningMessageText;
     public static TextComponent WarningMessageText;
 
+    public static CanvasController GameCanvas;
+    public CanvasController _GameCanvas;
+    public static CanvasController LoginCanvas;
+    public CanvasController _LoginCanvas;
+
     // Start is called before the first frame update
     void Start()
     {
         WarningMessageText = _WarningMessageText;
+        GameCanvas = _GameCanvas;
+        LoginCanvas = _LoginCanvas;
     }
 
     // Update is called once per frame
@@ -77,6 +85,7 @@ public class SocketDataManager : MonoBehaviour
                 case Commands.JackpotResults: JackpotResults(data); break;
                 case Commands.WonBoardSlot: WonBoardSlot(data); break;
                 case Commands.GiveBoard: GiveBoard(data); break;
+                case Commands.JoinState: JoinState(data); break;
             }
         }
     }
@@ -249,6 +258,16 @@ public class SocketDataManager : MonoBehaviour
             GameBoard.GetSlot(slot).setChips(number);
 
             data = data.Skip(blockLength).ToArray();
+        }
+    }
+
+    public static void JoinState(byte[] data) {
+        if (data[2] == 1) {
+            LoginCanvas.Active = (false);
+            GameCanvas.Active = (true);
+        } else {
+            LoginCanvas.Active = (true);
+            GameCanvas.Active = (false);
         }
     }
 }
